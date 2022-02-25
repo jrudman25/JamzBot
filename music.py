@@ -11,8 +11,12 @@ class music(commands.Cog):
     await ctx.send("Use ^join to get the bot into the channel that you're in and ^play insertLinkHere to play. Use ^abilities for more!")
 
   @commands.command()
+  async def updates(self, ctx):
+    await ctx.send("Queue system, search capabilities, and (maybe) auto-deleting messages!")
+
+  @commands.command()
   async def abilities(self, ctx):
-    await ctx.send("^support, ^join, ^play, ^pause, ^resume, ^disconnect")
+    await ctx.send("^support, ^join, ^play, ^pause, ^resume, ^stop, ^disconnect, ^updates")
   
   @commands.command()
   async def join(self, ctx):
@@ -27,6 +31,9 @@ class music(commands.Cog):
       
   @commands.command()
   async def play(self, ctx, url):
+    if ctx.voice_client is None:
+      await ctx.send("Must use join command before playing!")
+      return
     ctx.voice_client.stop()
     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
     YDL_OPTIONS = {'format':"bestaudio"}
@@ -37,21 +44,64 @@ class music(commands.Cog):
       url2 = info['formats'][0]['url']
       source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMPEG_OPTIONS)
       vc.play(source)
+      if ctx.voice_client.is_playing() is True:
+        await ctx.send("Playing! :arrow_forward:")
+      else:
+        await ctx.send("Error! Please try another link :frowning:")
+
+  @commands.command()
+  async def stop(self, ctx):
+    try:
+      if ctx.voice_client.is_playing() is True:
+        ctx.voice_client.stop()
+        await ctx.send("Stopped! :x:")
+      else:
+        await ctx.send("Bot is not playing anything!")
+    except AttributeError:
+        await ctx.send("Bot is not playing anything!")
 
   @commands.command()
   async def disconnect(self, ctx):
-    await ctx.voice_client.disconnect()
+    if ctx.voice_client is not None:
+      await ctx.voice_client.disconnect()
+      await ctx.send("Disconnected! :wave:")
+    else:
+      await ctx.send("Bot is not in a voice channel!")
 
   @commands.command()
   async def pause(self, ctx):
-    ctx.voice_client.pause()
-    await ctx.send("Paused! :pause_button:")
+    try:
+      if ctx.voice_client.is_playing() is True:
+        ctx.voice_client.pause()
+        await ctx.send("Paused! :pause_button:")
+      else:
+        await ctx.send("Bot is not playing anything!")
+    except AttributeError:
+        await ctx.send("Bot is not playing anything!")
 
   @commands.command()
   async def resume(self, ctx):
-    ctx.voice_client.resume()
-    await ctx.send("Resumed! :play_pause:")
-    
+    try:
+      if ctx.voice_client.is_playing() is True:
+        await ctx.send("Bot is already playing something! :notes:")
+        return
+      
+      ctx.voice_client.resume()
+      if ctx.voice_client.is_playing() is True:
+        await ctx.send("Resumed! :play_pause:")
+      else:
+        await ctx.send("Bot is not playing anything!")
+    except AttributeError:
+        await ctx.send("Bot is not playing anything!")
 
+  @commands.Cog.listener()
+  async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        if isinstance(error, commands.CommandNotFound):
+          await ctx.send("Command unknown!")
+          return
+        else:
+          await ctx.send("Something went wrong! Please try again")
+      
+# Setup
 def setup(client):
   client.add_cog(music(client))

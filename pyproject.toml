@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "JamzBot"
-version = "1.0.0"
+version = "1.2.0"
 description = "A quick Discord bot for playing music via YouTube!"
 authors = ["Jordan Rudman <jrud25@vt.edu>"]
 

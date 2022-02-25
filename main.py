@@ -4,8 +4,9 @@ import os
 from keep_running import keep_running
 import music
 
+# nix-env -iA nixpkgs.ffmpeg to install ffmpeg properly
+
 client = commands.Bot(command_prefix = '^', intents = discord.Intents.all())
-clientName = discord.Client()
 cogs = [music]
 
 for i in range(len(cogs)):
@@ -13,7 +14,7 @@ for i in range(len(cogs)):
 
 @client.event
 async def on_ready():
-  print('Successfully logged in as {0.user}'.format(clientName))
+  print('Successfully logged in!')
   await client.change_presence(activity=discord.Game(name="^support to get started!"))
 
 keep_running()

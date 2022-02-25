@@ -1,6 +1,8 @@
 To do:
 - Add queue
+- Add search
 - Comments
-- Appropriate responses (no disconnect message if not in a vc, etc.)
+- Message when join command given in same vc
 - Fix login message in console
 - Log who plays what?
+- Auto-delete messages?
