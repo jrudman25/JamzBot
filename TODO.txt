@@ -1,0 +1,6 @@
+To do:
+- Add queue
+- Comments
+- Appropriate responses (no disconnect message if not in a vc, etc.)
+- Fix login message in console
+- Log who plays what?
